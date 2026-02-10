@@ -1,133 +1,187 @@
 {
-  "project_name": "AthenaVision",
-  "design_philosophy": {
-    "name": "The Constructivist Library",
-    "core_concept": "Industrial Efficiency meets Human Warmth. A digital printing press for the modern age.",
-    "principles": [
-      "Form follows Function: The search bar is the engine; make it massive and central.",
-      "Dynamic Asymmetry: Use diagonals and offset grids to create tension in the UI.",
-      "Typography as Image: Headings should be large, geometric, and structural.",
-      "Paper & Ink: The reading experience must feel organic, not digital. Warm backgrounds, sharp text."
-    ]
+  "design_system": {
+    "identity": {
+      "name": "Project Athena",
+      "aesthetic": "High-End Editorial / Digital Magazine",
+      "inspiration": ["Vogue", "The New Yorker", "Kinfolk", "Esquire"],
+      "core_values": ["Intellectual", "Sophisticated", "Timeless", "Bold"],
+      "tone": "Curated, Authoritative, Elegant"
+    },
+    "typography": {
+      "font_family": {
+        "heading": "Playfair Display, serif",
+        "body": "DM Sans, sans-serif",
+        "accent": "Cormorant Garamond, serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "display": "text-6xl md:text-8xl font-medium tracking-tight leading-[0.9]",
+        "h1": "text-5xl md:text-6xl font-medium tracking-tight",
+        "h2": "text-4xl md:text-5xl font-normal tracking-tight",
+        "h3": "text-2xl md:text-3xl font-normal",
+        "body_lg": "text-lg md:text-xl leading-relaxed font-light",
+        "body_base": "text-base leading-relaxed text-muted-foreground",
+        "caption": "text-xs uppercase tracking-[0.2em] font-bold text-muted-foreground"
+      },
+      "usage_rules": [
+        "Headings MUST use Playfair Display.",
+        "Body text MUST use DM Sans.",
+        "Quotes and pull-text MUST use Cormorant Garamond (Italic).",
+        "Navigation links should be uppercase and tracking-widest."
+      ]
+    },
+    "colors": {
+      "palette": {
+        "primary": "#121212",
+        "secondary": "#F2F0E9",
+        "accent": "#D93025",
+        "muted": "#E5E2D9",
+        "paper": "#FFFEF9",
+        "ink": "#0A0A0A",
+        "concrete": "#8C8C8C"
+      },
+      "semantic": {
+        "background": "bg-[#F2F0E9]",
+        "foreground": "text-[#121212]",
+        "card": "bg-[#FFFEF9]",
+        "card_foreground": "text-[#121212]",
+        "primary_btn": "bg-[#121212] text-[#FFFEF9] hover:bg-[#2A2A2A]",
+        "secondary_btn": "bg-transparent border border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-[#FFFEF9]",
+        "accent_element": "text-[#D93025]"
+      },
+      "gradients": {
+        "editorial_fade": "bg-gradient-to-b from-transparent to-[#F2F0E9]",
+        "image_overlay": "bg-gradient-to-t from-[#121212]/80 via-transparent to-transparent"
+      }
+    },
+    "layout": {
+      "grid_system": {
+        "container": "container mx-auto px-4 md:px-8 max-w-7xl",
+        "magazine_grid": "grid grid-cols-1 md:grid-cols-12 gap-y-12 gap-x-8",
+        "article_col": "col-span-1 md:col-span-8 md:col-start-3",
+        "sidebar_col": "col-span-1 md:col-span-3 md:col-start-10"
+      },
+      "spacing": {
+        "section_py": "py-24 md:py-32",
+        "element_gap": "gap-6 md:gap-12"
+      },
+      "borders": {
+        "style": "border border-[#121212]/10",
+        "heavy": "border-2 border-[#121212]",
+        "radius": "rounded-none"
+      }
+    },
+    "components": {
+      "buttons": {
+        "primary": "h-12 px-8 bg-[#121212] text-white font-medium tracking-wide hover:bg-[#D93025] transition-colors duration-300 rounded-none uppercase text-sm",
+        "secondary": "h-12 px-8 bg-transparent border border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white transition-colors duration-300 rounded-none uppercase text-sm",
+        "ghost": "hover:bg-transparent hover:text-[#D93025] hover:underline underline-offset-4"
+      },
+      "cards": {
+        "book_cover": "aspect-[2/3] bg-[#E5E2D9] relative overflow-hidden group cursor-pointer border border-[#121212]/5 hover:border-[#121212] transition-all duration-500",
+        "feature_card": "p-8 bg-[#FFFEF9] border border-[#121212]/10 hover:border-[#121212] transition-all duration-300 group"
+      },
+      "inputs": {
+        "search_bar": "h-16 w-full bg-transparent border-b-2 border-[#121212] text-2xl md:text-4xl font-serif placeholder:text-[#121212]/30 focus:outline-none focus:border-[#D93025] transition-colors px-0"
+      }
+    },
+    "visual_enhancers": {
+      "textures": [
+        "noise-overlay: opacity-5 pointer-events-none fixed inset-0 z-50 mix-blend-overlay",
+        "paper-grain: bg-[url('/textures/paper.png')]"
+      ],
+      "decorations": [
+        "vertical-lines: absolute left-0 top-0 bottom-0 w-px bg-[#121212]/10",
+        "drop-caps: first-letter:text-7xl first-letter:font-serif first-letter:float-left first-letter:mr-4 first-letter:leading-none"
+      ]
+    },
+    "motion": {
+      "transitions": "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+      "hover_effects": "group-hover:-translate-y-1 group-hover:shadow-[4px_4px_0px_0px_rgba(18,18,18,1)]",
+      "scroll_reveal": "opacity-0 translate-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards"
+    }
   },
-  "typography": {
-    "font_providers": [
-      "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+  "assets": {
+    "images": {
+      "hero_backgrounds": [
+        {
+          "url": "https://images.unsplash.com/photo-1769650795992-3880e6b04baf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwZWRpdG9yaWFsJTIwcmVhZGluZyUyMG1vZGVsJTIwbGlicmFyeXxlbnwwfHx8fDE3NzA3MDcxMjh8MA&ixlib=rb-4.1.0&q=85",
+          "alt": "Woman posing with books in a library aisle",
+          "category": "hero"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1760237658139-ea4ff6c33a91?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcmNoaXRlY3R1cmFsJTIwbGlicmFyeSUyMGludGVyaW9yJTIwbWluaW1hbGlzdHxlbnwwfHx8fDE3NzA3MDcxNDJ8MA&ixlib=rb-4.1.0&q=85",
+          "alt": "Modern library interior with wooden architectural elements",
+          "category": "hero_secondary"
+        }
+      ],
+      "book_covers": [
+        {
+          "url": "https://images.unsplash.com/photo-1621944190310-e3cca1564bd7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1pbmltYWxpc3QlMjBib29rJTIwY292ZXIlMjBhcnQlMjBkZXNpZ258ZW58MHx8fHwxNzcwNzA3MTM0fDA&ixlib=rb-4.1.0&q=85",
+          "alt": "Minimalist white hardcover book",
+          "category": "book_cover"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1575823857138-d80155581d8c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMG1pbmltYWxpc3QlMjBib29rJTIwY292ZXIlMjBhcnQlMjBkZXNpZ258ZW58MHx8fHwxNzcwNzA3MTM0fDA&ixlib=rb-4.1.0&q=85",
+          "alt": "Abstract black and white painting cover",
+          "category": "book_cover"
+        }
+      ],
+      "avatars": [
+        {
+          "url": "https://images.unsplash.com/photo-1584347922562-5d9542ec02ba?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwxfHxzdHlsaXNoJTIwZGl2ZXJzZSUyMHVzZXIlMjBhdmF0YXJzJTIwcG9ydHJhaXRzJTIwcHJvZmVzc2lvbmFsfGVufDB8fHx8MTc3MDcwNzEzOXww&ixlib=rb-4.1.0&q=85",
+          "alt": "Woman with red lipstick",
+          "category": "user_avatar"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1512324981942-bff898741db0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxzdHlsaXNoJTIwZGl2ZXJzZSUyMHVzZXIlMjBhdmF0YXJzJTIwcG9ydHJhaXRzJTIwcHJvZmVzc2lvbmFsfGVufDB8fHx8MTc3MDcwNzEzOXww&ixlib=rb-4.1.0&q=85",
+          "alt": "Woman wearing black hat",
+          "category": "user_avatar"
+        }
+      ]
+    }
+  },
+  "instructions_to_main_agent": {
+    "general_rules": [
+      "NEVER use standard Bootstrap/Material layouts. Think 'Poster Design' for every section.",
+      "Use 'Playfair Display' for all headings (h1-h3). Use 'DM Sans' for body text.",
+      "Implement a 'Noise' overlay on the body background to give a paper texture feel.",
+      "Buttons should be sharp (rounded-none) and uppercase.",
+      "Use generous padding (py-24, py-32) between sections.",
+      "Images should often overlap text or other images (z-index layering).",
+      "Use 1px solid borders for separation instead of shadows.",
+      "For the Reader view, focus on typography legibility: max-width-prose, comfortable leading."
     ],
-    "headings": {
-      "family": "\"Space Grotesk\", sans-serif",
-      "weights": {
-        "default": "700",
-        "subtle": "500"
+    "page_specifics": {
+      "landing_page": {
+        "hero": "Split screen or full-width image with massive overlay typography. The ISBN input should be the centerpiece, styled like a luxury search bar.",
+        "features": "Use a 'Bento' grid or alternating magazine layout (Text Left/Image Right -> Image Left/Text Right)."
       },
-      "usage": "All page titles, section headers, and the main hero statement."
+      "reader_view": {
+        "layout": "Distraction-free. Cream/Paper background. Serif font for the book text. Progress bar should be thin and elegant (like a bookmark).",
+        "controls": "Minimalist, floating or tucked away in a drawer."
+      },
+      "dashboard": {
+        "style": "Grid of book covers. Use a masonry layout if possible. Stats should be displayed with large numbers and small labels (Editorial style)."
+      }
     },
-    "ui_body": {
-      "family": "\"DM Sans\", sans-serif",
-      "weights": {
-        "regular": "400",
-        "medium": "500",
-        "bold": "700"
-      },
-      "usage": "Navigation, buttons, forms, dashboard metrics, metadata labels."
-    },
-    "reader_body": {
-      "family": "\"EB Garamond\", serif",
-      "weights": {
-        "regular": "400",
-        "medium": "500"
-      },
-      "usage": "The actual book content in Reader Mode. CRITICAL for long-form readability."
+    "accessibility": {
+      "contrast": "Ensure text is #121212 on #F2F0E9 background for maximum readability.",
+      "focus_states": "Use a sharp 2px solid border (#D93025) for focus states."
     }
   },
-  "colors": {
-    "palette": {
-      "canvas": "#F2F0E9",
-      "paper": "#FFFEF9",
-      "ink": "#121212",
-      "signal_red": "#D93025",
-      "concrete": "#8C8C8C",
-      "warm_grey": "#E5E2D9"
-    },
-    "usage": {
-      "background": "bg-[#F2F0E9]",
-      "foreground": "text-[#121212]",
-      "primary": "bg-[#D93025] text-white hover:bg-[#B02015]",
-      "secondary": "bg-[#121212] text-white hover:bg-[#2C2C2C]",
-      "muted": "bg-[#E5E2D9] text-[#121212]",
-      "border": "border-[#121212]",
-      "reader_bg": "bg-[#FFFEF9]",
-      "reader_text": "text-[#121212]"
-    },
-    "theme_strategy": "Light Mode Default (Paper aesthetic). Dark Mode is 'Blueprint' style (Deep Slate #1A1A1A bg, White text, Red accents)."
-  },
-  "layout": {
-    "grid_system": "The Tetris Grid (Mode A)",
-    "spacing": "Generous. Use p-8 to p-12 for containers. Gap-6 to Gap-8 for grids.",
-    "border_radius": {
-      "default": "rounded-none",
-      "buttons": "rounded-none",
-      "inputs": "rounded-none",
-      "cards": "rounded-none",
-      "reader_container": "rounded-sm"
-    },
-    "borders": "1px solid #121212. Use 2px solid for active states or primary containers."
-  },
-  "components": {
-    "buttons": {
-      "style": "Sharp edges (rounded-none). Uppercase text. Tracking-wide. Solid background or thick outline.",
-      "primary": "bg-[#D93025] text-white hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(18,18,18,1)] transition-all",
-      "secondary": "bg-transparent border-2 border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white transition-all"
-    },
-    "inputs": {
-      "style": "Massive height (h-14 or h-16). No border-radius. Thick border (2px).",
-      "focus": "ring-0 border-[#D93025] bg-white"
-    },
-    "cards": {
-      "style": "Flat background (White or Warm Grey). 1px Border. No shadow by default, hard shadow on hover.",
-      "hover": "hover:shadow-[6px_6px_0px_0px_rgba(18,18,18,1)] hover:-translate-y-1 transition-all duration-200"
-    },
-    "reader_view": {
-      "container": "max-w-prose mx-auto px-6 py-12 bg-[#FFFEF9] shadow-sm min-h-screen",
-      "typography": "text-lg md:text-xl leading-relaxed font-serif text-[#121212]"
-    }
-  },
-  "visual_enhancers": {
-    "textures": "Add a subtle 'noise' overlay to the body background to simulate paper grain.",
-    "shapes": "Use CSS shapes (triangles, circles) in absolute positioning behind the Hero section.",
-    "motion": "Snappy. Duration-200 ease-out. No bouncy springs. Linear or slight ease."
-  },
-  "image_urls": {
-    "hero_background": "https://images.unsplash.com/photo-1613969673101-c982c30287f2?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "library_vibe": "https://images.unsplash.com/photo-1597920940566-a77511f9327d?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "reading_moment": "https://images.unsplash.com/photo-1763890965393-1cea435581ab?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "abstract_shape": "https://images.unsplash.com/photo-1683012327998-afe8a9fc24ae?crop=entropy&cs=srgb&fm=jpg&q=85"
-  },
-  "instructions_to_main_agent": [
-    "1. INSTALL FONTS: Add the Google Fonts link to the <head> of index.html immediately.",
-    "2. CONFIGURE TAILWIND: Update tailwind.config.js to include the new font families (Space Grotesk, DM Sans, EB Garamond) and the custom color palette.",
-    "3. OVERRIDE SHADCN: Go to /app/frontend/src/components/ui/button.jsx and input.jsx. Remove 'rounded-md' classes. Enforce 'rounded-none'.",
-    "4. LAYOUT: Build the Landing Page using the 'Tetris Grid'. Do not center everything. Use the 'hero_background' image with a heavy opacity overlay (90% cream) so text pops.",
-    "5. READER MODE: This is the core product. It MUST use 'EB Garamond'. Ensure line-height is 1.6 or 1.7. Add a progress bar at the top.",
-    "6. SEARCH BAR: Make it the 'Hero' of the home page. It should be huge (text-2xl input).",
-    "7. DATA-TESTID: Add data-testid to the Search Input, Search Button, Login Button, and Book Reader Container."
-  ],
-  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
-    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
-    "Create depth through layered design elements with z-index hierarchy",
-    "Use glass-morphism effects with backdrop filters (12-24px blur) ONLY for the sticky header.",
-    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
-    "You MUST NOT center align the app container.",
-    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
-    "NEVER: use AI assistant Emoji characters like 🤖🧠 etc for icons.",
-    "Every interaction needs micro-animations - hover states, transitions.",
-    "Use 2-3x more spacing than feels comfortable.",
-    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
-    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN",
-    "Prioritize using pre-existing components from src/components/ui when applicable",
-    "Components MUST use named exports",
-    "Pages MUST use default exports",
-    "Use sonner for toasts"
-  ]
+  "universal_guidelines": {
+    "do_not": [
+      "Do NOT use gradients for backgrounds (except subtle noise).",
+      "Do NOT use rounded corners > 4px (prefer 0px).",
+      "Do NOT use generic 'blue' for links. Use black or red.",
+      "Do NOT center text unless it's a specific 'Editor's Note' style section."
+    ],
+    "must_do": [
+      "MUST use the provided image URLs for placeholders.",
+      "MUST add data-testid to all interactive elements.",
+      "MUST use 'sonner' for toasts.",
+      "MUST use 'lucide-react' for icons (thin stroke)."
+    ]
+  }
 }
