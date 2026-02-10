@@ -1,0 +1,94 @@
+{
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 14,
+    "success_rate": 100.0,
+    "timestamp": "2026-02-10T06:58:16.442215"
+  },
+  "detailed_results": [
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:06.587425"
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:07.259068"
+    },
+    {
+      "test": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:08.038985"
+    },
+    {
+      "test": "ISBN Search - Valid",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:09.510218"
+    },
+    {
+      "test": "ISBN Search - Invalid",
+      "success": true,
+      "details": "Status: 400",
+      "timestamp": "2026-02-10T06:58:10.275279"
+    },
+    {
+      "test": "Book Content Fetch",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:12.371731"
+    },
+    {
+      "test": "Save Reading Progress",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:12.848116"
+    },
+    {
+      "test": "Get Reading Progress",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:13.293074"
+    },
+    {
+      "test": "Create Bookmark",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:13.650966"
+    },
+    {
+      "test": "Get Bookmarks",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:14.415335"
+    },
+    {
+      "test": "Delete Bookmark",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:15.179731"
+    },
+    {
+      "test": "Create Highlight",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:15.537615"
+    },
+    {
+      "test": "Get Highlights",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:15.983541"
+    },
+    {
+      "test": "Get User Library",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-10T06:58:16.441288"
+    }
+  ]
+}
