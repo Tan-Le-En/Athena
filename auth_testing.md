@@ -27,7 +27,7 @@ print('User ID: ' + userId);
 ## Step 2: Test Backend API
 ```bash
 # Test auth endpoint
-curl -X GET "https://bookbridge-13.preview.emergentagent.com/api/auth/me" \
+curl -X GET "http://localhost:8001/api/auth/me" \
   -H "Authorization: Bearer YOUR_SESSION_TOKEN"
 ```
 
