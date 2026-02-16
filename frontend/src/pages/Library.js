@@ -32,87 +32,93 @@ export default function Library({ user, logout }) {
   };
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <header className="border-b-2 border-ink bg-paper sticky top-0 z-50">
+    <div className="min-h-screen bg-canvas font-sans">
+      <header className="border-b border-border bg-paper/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
-              className="rounded-none"
+              className="rounded-none hover:bg-transparent hover:text-ink/70 px-0"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              <span className="font-sans uppercase tracking-widest text-xs font-bold">Return</span>
             </Button>
-            <LibraryIcon className="w-8 h-8 text-signal" strokeWidth={2.5} />
-            <h1 className="text-2xl font-heading font-bold text-ink tracking-tight">My Library</h1>
+            <div className="h-6 w-px bg-border"></div>
+            <h1 className="text-xl font-serif font-bold text-ink italic">Athena Collection</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-2 bg-warmgrey rounded-none">
-              <User className="w-4 h-4" />
-              <span className="text-sm font-medium">{user.name}</span>
-            </div>
-            <Button onClick={logout} variant="ghost" className="rounded-none">
+          <div className="flex items-center gap-6">
+             <div className="hidden md:flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Reader</span>
+                <span className="font-serif italic text-lg">{user.name}</span>
+             </div>
+            <Button onClick={logout} variant="ghost" className="rounded-none hover:bg-destructive hover:text-white transition-colors">
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-16">
+        <div className="mb-12 border-b border-ink/10 pb-8">
+            <h2 className="text-6xl font-serif font-black mb-4">Your Archive</h2>
+            <p className="font-sans text-muted-foreground max-w-xl leading-relaxed">
+                A curated selection of literary works you are currently verifying and consuming.
+            </p>
+        </div>
+
         {loading ? (
-          <div className="text-center py-12">
-            <div className="text-ink text-xl font-heading">Loading library...</div>
+          <div className="text-center py-24">
+             <div className="text-ink text-xl font-serif italic animate-pulse">Retrieving archives...</div>
           </div>
         ) : library.length === 0 ? (
-          <div className="text-center py-20">
-            <LibraryIcon className="w-16 h-16 text-concrete mx-auto mb-4" />
-            <h2 className="text-2xl font-heading font-bold text-ink mb-2">Your library is empty</h2>
-            <p className="text-concrete mb-6">Start reading books to build your collection</p>
+          <div className="text-center py-32 border border-dashed border-border">
+            <LibraryIcon className="w-12 h-12 text-muted-foreground mx-auto mb-6 opacity-50" />
+            <h2 className="text-3xl font-serif font-bold text-ink mb-3">The shelves are empty</h2>
+            <p className="text-muted-foreground mb-8 font-sans">Begin your collection by adding a verified work.</p>
             <Button
               onClick={() => navigate('/')}
-              className="bg-signal text-white hover:bg-[#B02015] rounded-none font-bold tracking-wide uppercase"
+              className="bg-ink text-paper hover:bg-ink/90 rounded-none font-sans font-bold tracking-widest uppercase px-8 py-6"
             >
-              Search Books
+              Discover Works
             </Button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {library.map((item, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/reader/${item.book.isbn}`)}
-                className="bg-paper border-2 border-ink p-4 cursor-pointer constructivist-border"
+                className="group cursor-pointer"
                 data-testid={`library-book-${idx}`}
               >
-                <div className="flex gap-4">
+                <div className="relative aspect-[2/3] mb-6 overflow-hidden bg-warmgrey border border-ink/10 group-hover:border-ink transition-colors">
                   {item.book.cover_url ? (
                     <img
                       src={item.book.cover_url}
                       alt={item.book.title}
-                      className="w-20 h-28 object-cover border-2 border-ink"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-20 h-28 bg-warmgrey border-2 border-ink flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-concrete" />
+                    <div className="w-full h-full flex items-center justify-center bg-paper">
+                      <BookOpen className="w-12 h-12 text-muted-foreground/30" />
                     </div>
                   )}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-bold text-ink mb-1">{item.book.title}</h3>
-                    <p className="text-sm text-concrete mb-2">{item.book.authors.join(', ')}</p>
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-concrete">Progress</span>
-                        <span className="font-medium text-ink">{item.progress.toFixed(0)}%</span>
-                      </div>
-                      <div className="h-2 bg-warmgrey border border-ink">
-                        <div
-                          className="h-full bg-signal"
-                          style={{ width: `${item.progress}%` }}
-                        />
-                      </div>
-                    </div>
+                  <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/5 transition-colors" />
+                  
+                  <div className="absolute bottom-0 left-0 right-0 bg-paper border-t border-ink px-4 py-3 flex justify-between items-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                     <span className="font-sans text-[10px] uppercase tracking-widest font-bold">Continue</span>
+                     <span className="font-serif italic">{item.progress.toFixed(0)}%</span>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex justify-between items-start border-t border-ink pt-3">
+                        <span className="font-sans text-[10px] uppercase tracking-widest text-muted-foreground font-bold">No. {idx + 1}</span>
+                         <span className="font-sans text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{item.last_read ? new Date(item.last_read).toLocaleDateString() : 'New'}</span>
+                    </div>
+                    <h3 className="font-serif text-2xl font-bold leading-tight group-hover:underline decoration-1 underline-offset-4">{item.book.title}</h3>
+                    <p className="font-serif italic text-muted-foreground">{item.book.authors?.join(', ') || 'Unknown Author'}</p>
                 </div>
               </div>
             ))}

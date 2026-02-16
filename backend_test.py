@@ -3,8 +3,8 @@ import sys
 import json
 from datetime import datetime
 
-class AthenaVisionAPITester:
-    def __init__(self, base_url="https://bookbridge-13.preview.emergentagent.com"):
+class AthenaAPITester:
+    def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None

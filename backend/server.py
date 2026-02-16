@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -13,15 +14,59 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 import httpx
 import re
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# Logging setup
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-app = FastAPI()
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+db_name = os.environ.get('DB_NAME', 'athena_db')
+
+# These are initialized in lifespan
+client = None
+db = None
+
+@asynccontextmanager
+async def lifespan(app):
+    # Startup
+    global client, db
+    logger.info("Connecting to MongoDB...")
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[db_name]
+    logger.info("MongoDB connected.")
+    yield
+    # Shutdown
+    logger.info("Closing MongoDB connection...")
+    client.close()
+    logger.info("MongoDB connection closed.")
+
+limiter = Limiter(key_func=get_remote_address)
+app = FastAPI(title="Athena API", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+# CORS must be added BEFORE routes
+allowed_origins = re.split(r'[;,]', os.environ.get('CORS_ORIGINS', '*'))
+allowed_origins = [o.strip() for o in allowed_origins if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'athena-secret-key-change-in-production')
@@ -45,6 +90,9 @@ class User(BaseModel):
     email: EmailStr
     name: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    current_streak: int = 0
+    longest_streak: int = 0
+    last_active_date: Optional[datetime] = None
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -141,6 +189,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     if isinstance(user.get('created_at'), str):
         user['created_at'] = datetime.fromisoformat(user['created_at'])
+    if isinstance(user.get('last_active_date'), str):
+        user['last_active_date'] = datetime.fromisoformat(user['last_active_date'])
     
     return User(**user)
 
@@ -200,8 +250,50 @@ async def fetch_book_text(isbn: str) -> Optional[str]:
             logging.error(f"Error fetching book text: {e}")
     return None
 
+async def update_user_streak(email: str):
+    user = await db.users.find_one({"email": email})
+    if not user:
+        return
+    
+    now = datetime.now(timezone.utc)
+    today = now.date()
+    
+    last_active = user.get("last_active_date")
+    current_streak = user.get("current_streak", 0)
+    longest_streak = user.get("longest_streak", 0)
+    
+    if isinstance(last_active, str):
+        try:
+            last_active = datetime.fromisoformat(last_active)
+        except ValueError:
+            last_active = None
+            
+    updates = {"last_active_date": now.isoformat()}
+    
+    if last_active:
+        last_date = last_active.date()
+        diff = (today - last_date).days
+        
+        if diff == 1:
+            # Consecutive day
+            current_streak += 1
+            updates["current_streak"] = current_streak
+            if current_streak > longest_streak:
+                updates["longest_streak"] = current_streak
+        elif diff > 1:
+            # Streak broken
+            updates["current_streak"] = 1
+        # If diff == 0, same day, do nothing regarding streak count
+    else:
+        # First activity
+        updates["current_streak"] = 1
+        updates["longest_streak"] = 1
+        
+    await db.users.update_one({"email": email}, {"$set": updates})
+
 @api_router.post("/auth/register", response_model=TokenResponse)
-async def register(user_data: UserCreate):
+@limiter.limit("5/minute")
+async def register(request: Request, user_data: UserCreate):
     existing_user = await db.users.find_one({"email": user_data.email})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -211,7 +303,10 @@ async def register(user_data: UserCreate):
         "email": user_data.email,
         "name": user_data.name,
         "password": hashed_password,
-        "created_at": datetime.now(timezone.utc).isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "current_streak": 0,
+        "longest_streak": 0,
+        "last_active_date": None
     }
     
     await db.users.insert_one(user_dict)
@@ -225,17 +320,25 @@ async def register(user_data: UserCreate):
     return TokenResponse(access_token=access_token, user=user)
 
 @api_router.post("/auth/login", response_model=TokenResponse)
-async def login(user_data: UserLogin):
+@limiter.limit("10/minute")
+async def login(request: Request, user_data: UserLogin):
     user = await db.users.find_one({"email": user_data.email})
     if not user or not verify_password(user_data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    
+     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user_data.email}, expires_delta=access_token_expires
     )
     
-    user_obj = User(email=user["email"], name=user["name"])
+    user_obj = User(
+        email=user["email"], 
+        name=user["name"], 
+        created_at=user.get("created_at"),
+        current_streak=user.get("current_streak", 0),
+        longest_streak=user.get("longest_streak", 0),
+        last_active_date=user.get("last_active_date")
+    )
     return TokenResponse(access_token=access_token, user=user_obj)
 
 @api_router.get("/auth/me", response_model=User)
@@ -243,7 +346,8 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 @api_router.get("/books/search/{isbn}", response_model=BookMetadata)
-async def search_book(isbn: str):
+@limiter.limit("20/minute")
+async def search_book(request: Request, isbn: str):
     if not validate_isbn(isbn):
         raise HTTPException(status_code=400, detail="Invalid ISBN format")
     
@@ -277,7 +381,8 @@ async def search_book(isbn: str):
     return BookMetadata(**metadata)
 
 @api_router.get("/books/content/{isbn}")
-async def get_book_content(isbn: str, current_user: User = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def get_book_content(request: Request, isbn: str, current_user: User = Depends(get_current_user)):
     clean_isbn = isbn.replace("-", "").replace(" ", "")
     
     cached_content = await db.book_contents.find_one({"isbn": clean_isbn}, {"_id": 0})
@@ -315,6 +420,9 @@ async def save_progress(progress_data: ProgressCreate, current_user: User = Depe
         upsert=True
     )
     
+    # Update Streak
+    await update_user_streak(current_user.email)
+    
     return Progress(**progress_dict)
 
 @api_router.get("/progress/{isbn}", response_model=Optional[Progress])
@@ -340,6 +448,10 @@ async def create_bookmark(bookmark_data: BookmarkCreate, current_user: User = De
     }
     
     await db.bookmarks.insert_one(bookmark_dict)
+    
+    # Creating a bookmark counts as activity
+    await update_user_streak(current_user.email)
+    
     return Bookmark(**bookmark_dict)
 
 @api_router.get("/bookmarks/{isbn}", response_model=List[Bookmark])
@@ -375,6 +487,10 @@ async def create_highlight(highlight_data: HighlightCreate, current_user: User =
     }
     
     await db.highlights.insert_one(highlight_dict)
+    
+    # Highlighting counts as activity
+    await update_user_streak(current_user.email)
+
     return Highlight(**highlight_dict)
 
 @api_router.get("/highlights/{isbn}", response_model=List[Highlight])
@@ -409,22 +525,9 @@ async def get_user_library(current_user: User = Depends(get_current_user)):
     
     return library
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Render and monitoring."""
+    return {"status": "healthy", "service": "athena-backend"}
+
 app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()

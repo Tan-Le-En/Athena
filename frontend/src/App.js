@@ -12,12 +12,23 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const initializeApp = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        if (token && storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (e) {
+        console.error("Failed to parse user session:", e);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        // Shorter delay for "fast" feel while still showing the brand
+        setTimeout(() => setLoading(false), 800);
+      }
+    };
+    initializeApp();
   }, []);
 
   const login = (token, userData) => {
@@ -35,7 +46,10 @@ function App() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-canvas">
-        <div className="text-ink text-xl font-heading">Loading...</div>
+        <div className="relative">
+          <div className="text-ink text-3xl font-serif italic animate-pulse tracking-tighter">Athena</div>
+          <div className="h-px bg-ink w-full mt-2 origin-left scale-x-0 animate-in fade-in slide-in-from-left duration-1000 fill-mode-forwards" />
+        </div>
       </div>
     );
   }
@@ -60,6 +74,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
+      <div className="watermark">Tan Le En</div>
     </div>
   );
 }
