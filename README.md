@@ -1,28 +1,40 @@
-# Athena — Editorial Library
+# Athena — Digital Editorial Library
 
-> An immersive, editorial-style digital library that lets you search books by ISBN and instantly read public domain works from Internet Archive.
+An immersive, editorial-style digital library that lets you search books by ISBN and instantly read public domain works from Internet Archive.
+
+![Athena Logo](frontend/public/Athena_logo.png)
+
+## Features
+
+- **ISBN Search** - Find any book instantly by ISBN
+- **Instant Reading** - Get full text from Internet Archive in seconds
+- **Reading Progress** - Save and sync your reading position
+- **Bookmarks** - Save your favorite passages
+- **Highlights** - Mark and color-code important text
+- **Personal Library** - Track your reading collection
+- **Reading Streaks** - Stay motivated with daily reading goals
 
 ## Tech Stack
 
-| Layer    | Technology                           |
-| -------- | ------------------------------------ |
-| Frontend | React (CRA) + CRACO + TailwindCSS 3  |
-| Backend  | FastAPI + Uvicorn                    |
-| Database | MongoDB (local or Atlas)             |
-| Auth     | JWT (python-jose) + bcrypt           |
-| Hosting  | Vercel (frontend) + Render (backend) |
+| Layer | Technology |
+|-------|------------|
+| Frontend | React (CRA) + CRACO + TailwindCSS 3 |
+| Backend | FastAPI + Uvicorn |
+| Database | MongoDB (local or Atlas) |
+| Auth | JWT (python-jose) + bcrypt |
+| Hosting | Vercel (frontend) + Render (backend) |
 
----
-
-## Local Development
+## Quick Start
 
 ### Prerequisites
 
-- **Node.js** 18+ and **npm**
-- **Python** 3.10+
-- **MongoDB** running locally on `mongodb://localhost:27017` (or use MongoDB Atlas)
+- Node.js 18+ and npm
+- Python 3.10+
+- MongoDB (local or Atlas)
 
-### 1. Backend Setup
+### Local Development
+
+#### Backend Setup
 
 ```bash
 cd backend
@@ -35,6 +47,7 @@ Create `backend/.env`:
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=athena_db
 CORS_ORIGINS=http://localhost:3000
+SECRET_KEY=your-secret-key-here
 ```
 
 Start the backend:
@@ -44,12 +57,7 @@ cd backend
 uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-The API is now available at:
-
-- **Docs**: http://localhost:8000/docs
-- **Health**: http://localhost:8000/health
-
-### 2. Frontend Setup
+#### Frontend Setup
 
 ```bash
 cd frontend
@@ -60,7 +68,6 @@ Create `frontend/.env`:
 
 ```env
 REACT_APP_BACKEND_URL=http://localhost:8000
-ENABLE_HEALTH_CHECK=false
 ```
 
 Start the frontend:
@@ -72,65 +79,23 @@ npm start
 
 The app opens at **http://localhost:3000**
 
----
-
-## Production Deployment
-
-### Frontend → Vercel
-
-1. **Push your code** to GitHub
-2. **Import** the repo in [vercel.com](https://vercel.com)
-3. Set the **Root Directory** to `frontend`
-4. Set **Framework Preset** to `Create React App`
-5. Add **Environment Variable** in Vercel dashboard:
-   - `REACT_APP_BACKEND_URL` = `https://athena-backend.onrender.com` (your Render URL)
-6. **Deploy** — Vercel will run `npm run build` automatically
-
-The `vercel.json` in the frontend directory handles SPA routing (all routes → index.html).
-
-### Backend → Render
-
-1. **Push your code** to GitHub
-2. Go to [render.com](https://render.com) → **New** → **Blueprint**
-3. Connect your repo — the `render.yaml` will auto-configure the service
-4. Set **Environment Variables** in Render dashboard:
-   - `MONGO_URL` = your MongoDB Atlas connection string
-   - `CORS_ORIGINS` = your Vercel frontend URL (e.g., `https://athena-xyz.vercel.app`)
-5. `SECRET_KEY` and `DB_NAME` are auto-configured by render.yaml
-
-Or create a **Web Service** manually:
-
-- **Root Directory**: `backend`
-- **Runtime**: Python 3
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn server:app --host 0.0.0.0 --port $PORT`
-
-### MongoDB Atlas Setup
-
-See [DATABASE.md](DATABASE.md) for detailed instructions on setting up MongoDB Atlas for production.
-
----
-
 ## API Endpoints
 
-| Method | Endpoint                           | Auth | Description             |
-| ------ | ---------------------------------- | ---- | ----------------------- |
-| POST   | `/api/auth/register`               | No   | Create account          |
-| POST   | `/api/auth/login`                  | No   | Login                   |
-| GET    | `/api/auth/me`                     | Yes  | Get current user        |
-| GET    | `/api/books/search/{isbn}`         | No   | Search book by ISBN     |
-| GET    | `/api/books/content/{isbn}`        | Yes  | Get book full text      |
-| POST   | `/api/progress`                    | Yes  | Save reading progress   |
-| GET    | `/api/progress/{isbn}`             | Yes  | Get reading progress    |
-| POST   | `/api/bookmarks`                   | Yes  | Create bookmark         |
-| GET    | `/api/bookmarks/{isbn}`            | Yes  | Get bookmarks           |
-| DELETE | `/api/bookmarks/{isbn}/{position}` | Yes  | Delete bookmark         |
-| POST   | `/api/highlights`                  | Yes  | Create highlight        |
-| GET    | `/api/highlights/{isbn}`           | Yes  | Get highlights          |
-| GET    | `/api/library`                     | Yes  | Get user's book library |
-| GET    | `/health`                          | No   | Health check            |
-
----
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | No | Create account |
+| POST | `/api/auth/login` | No | Login |
+| GET | `/api/auth/me` | Yes | Get current user |
+| GET | `/api/books/search/{isbn}` | No | Search book by ISBN |
+| GET | `/api/books/content/{isbn}` | Yes | Get book full text |
+| POST | `/api/progress` | Yes | Save reading progress |
+| GET | `/api/progress/{isbn}` | Yes | Get reading progress |
+| POST | `/api/bookmarks` | Yes | Create bookmark |
+| GET | `/api/bookmarks/{isbn}` | Yes | Get bookmarks |
+| DELETE | `/api/bookmarks/{isbn}/{position}` | Yes | Delete bookmark |
+| POST | `/api/highlights` | Yes | Create highlight |
+| GET | `/api/highlights/{isbn}` | Yes | Get highlights |
+| GET | `/api/library` | Yes | Get user's book library |
 
 ## Project Structure
 
@@ -157,9 +122,18 @@ Athena/
 │   └── .env                # Local env vars (not committed)
 ├── render.yaml             # Render deployment blueprint
 ├── DATABASE.md             # MongoDB Atlas setup guide
+├── DEPLOY.md               # Deployment tutorial
 └── README.md               # This file
 ```
 
+## Deployment
+
+See [DEPLOY.md](DEPLOY.md) for detailed deployment instructions for Vercel and Render.
+
+## License
+
+MIT
+
 ---
 
-_Built by Tan Le En_
+Made by Tan Le En

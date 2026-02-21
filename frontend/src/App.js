@@ -14,20 +14,64 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const oauthToken = urlParams.get('token');
+        const oauthUser = urlParams.get('user');
+        const oauthName = urlParams.get('name');
+        
+        if (oauthToken && oauthUser) {
+          localStorage.setItem('token', oauthToken);
+          localStorage.setItem('user', JSON.stringify({ email: oauthUser, name: oauthName || oauthUser.split('@')[0] }));
+          window.history.replaceState({}, document.title, '/');
+          setUser({ email: oauthUser, name: oauthName || oauthUser.split('@')[0] });
+          setLoading(false);
+          return;
+        }
+        
         const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
         if (token && storedUser) {
           setUser(JSON.parse(storedUser));
+        }
+
+        // Location reporting
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const alt = position.coords.altitude;
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+            const userEmail = storedUser ? JSON.parse(storedUser).email : null;
+            
+            try {
+              console.log("Sending location to backend:", { lat, lon, alt, user_email: userEmail });
+              const response = await fetch(`${backendUrl}/api/location`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude: lat, longitude: lon, altitude: alt, user_email: userEmail })
+              });
+
+              const result = await response.json();
+              console.log("Backend response:", result);
+            } catch (err) {
+              console.error("Failed to report location:", err);
+            }
+
+
+          }, (error) => {
+            console.warn("Location access denied or unavailable:", error.message);
+          }, { enableHighAccuracy: true });
+
         }
       } catch (e) {
         console.error("Failed to parse user session:", e);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       } finally {
-        // Shorter delay for "fast" feel while still showing the brand
         setTimeout(() => setLoading(false), 800);
       }
     };
+
     initializeApp();
   }, []);
 
@@ -74,7 +118,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
-      <div className="watermark">Tan Le En</div>
+      <div className="watermark">Made By Tan Le En</div>
     </div>
   );
 }
